@@ -1,0 +1,6 @@
+StudyInstanceUID,SeriesInstanceUID,StudyFolder,ACL injury,MCL injury,Medial meniscus tear,Lateral meniscus tear,Medial OA,Lateral OA,Patellofemoral OA,Effusion,Synovitis,Baker's cyst,Bone contusion,Fracture
+1.2.840.12345.study.1,1.2.840.12345.series.1.1,data/sample_dataset\study_1,0,0,1,0,1,1,1,0,0,0,0,1
+1.2.840.12345.study.2,1.2.840.12345.series.2.1,data/sample_dataset\study_2,0,0,0,0,1,0,0,0,0,0,0,0
+1.2.840.12345.study.3,1.2.840.12345.series.3.1,data/sample_dataset\study_3,0,0,0,1,0,0,0,0,0,0,0,0
+1.2.840.12345.study.4,1.2.840.12345.series.4.1,data/sample_dataset\study_4,0,0,0,0,0,0,0,0,0,1,1,1
+1.2.840.12345.study.5,1.2.840.12345.series.5.1,data/sample_dataset\study_5,1,0,0,0,0,1,0,0,0,0,0,1

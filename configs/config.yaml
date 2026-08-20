@@ -1,0 +1,43 @@
+# KNEE-AI Master Configuration
+# Tier 1 & Tier 2 settings
+
+labels:
+  - "ACL injury"
+  - "MCL injury"
+  - "Medial meniscus tear"
+  - "Lateral meniscus tear"
+  - "Medial OA"
+  - "Lateral OA"
+  - "Patellofemoral OA"
+  - "Effusion"
+  - "Synovitis"
+  - "Baker's cyst"
+  - "Bone contusion"
+  - "Fracture"
+
+data:
+  target_size: [224, 224]
+  normalization_percentiles: [1.0, 99.0]
+  num_slices_2d5: 3  # Slice i-1, i, i+1
+  val_fraction: 0.2
+  seed: 42
+
+model:
+  backbone: "efficientnet_b0"  # timm or torchvision
+  pretrained: true
+  in_channels: 3
+  num_classes: 12
+  checkpoint_dir: "models/checkpoints/"
+
+training:
+  batch_size: 16
+  epochs: 15
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  use_pos_weight: true
+
+explainability:
+  confidence_threshold: 0.5
+
+llm:
+  model_id: "google/flan-t5-small" # Efficient instruction-tuned LLM for zero-shot JSON summarizing

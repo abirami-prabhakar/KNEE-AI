@@ -1,0 +1,14 @@
+Abnormality Label,Positive Count,AUROC,AUPRC,Precision,Recall,F1 Score
+ACL injury,0,0.5,0.0,0.0,0.0,0.0
+MCL injury,0,0.5,0.0,0.0,0.0,0.0
+Medial meniscus tear,0,0.5,0.0,0.0,0.0,0.0
+Lateral meniscus tear,0,0.5,0.0,0.0,0.0,0.0
+Medial OA,1,0.5,0.0,1.0,1.0,1.0
+Lateral OA,0,0.5,0.0,0.0,0.0,0.0
+Patellofemoral OA,0,0.5,0.0,0.0,0.0,0.0
+Effusion,0,0.5,0.0,0.0,0.0,0.0
+Synovitis,0,0.5,0.0,0.0,0.0,0.0
+Baker's cyst,0,0.5,0.0,0.0,0.0,0.0
+Bone contusion,0,0.5,0.0,0.0,0.0,0.0
+Fracture,0,0.5,0.0,0.0,0.0,0.0
+MACRO AVERAGE,1,0.5,0.0,0.0833,0.0833,0.0833

@@ -1,0 +1,27 @@
+# Data & Model Weights
+data/raw/
+data/processed/
+*.dcm
+*.zip
+models/checkpoints/*.pt
+models/checkpoints/*.pth
+models/checkpoints/*.ckpt
+
+# Python / Environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+
+# Notebooks & Output
+notebooks/sample_slices/*
+!.gitignore
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
