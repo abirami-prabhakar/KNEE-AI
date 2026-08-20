@@ -4,7 +4,7 @@
 
 ---
 
-## 🎯 Target Abnormality Labels (12 Target Outputs)
+##  Target Abnormality Labels (12 Target Outputs)
 1. ACL injury
 2. MCL injury
 3. Medial meniscus tear
@@ -20,7 +20,7 @@
 
 ---
 
-## 🏗️ Architecture & Core Rules
+## Architecture & Core Rules
 - **Multi-Label Sigmoid Outputs**: 12 independent binary classifications using `BCEWithLogitsLoss`.
 - **Strict Study-Level Validation Split**: Enforces patient identity isolation via code assertions in `data/loaders/dataset.py`.
 - **2.5D Volumetric Input**: Stacks 3 consecutive slices $[i-1, i, i+1]$ into `[3, 224, 224]` input tensors.
@@ -30,7 +30,7 @@
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 ```
 KNEE-AI/
 ├── app/
@@ -62,7 +62,7 @@ KNEE-AI/
 
 ---
 
-## 🚀 Quickstart Guide
+##  Quickstart Guide
 
 ### 1. Setup & Installation
 ```bash
