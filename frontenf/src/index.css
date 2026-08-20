@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --primary: #d2bbff;
+    --primary-container: #7c3aed;
+    --warning: #f59e0b;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: #dfe2eb;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* JetBrains Mono font class */
+  .font-mono-data {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom Scrollbar for Radiology UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #10141a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4455;
+}
+
+/* Minimalist Diagnostic Slider */
+input[type="range"].diagnostic-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #30363d;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"].diagnostic-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  border: 2px solid #d2bbff;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.6);
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+input[type="range"].diagnostic-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  background: #9055ff;
+}
+
+input[type="range"].diagnostic-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #7c3aed;
+  border: 2px solid #d2bbff;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* PACS crosshair cursor */
+.cursor-crosshair-pacs {
+  cursor: crosshair;
+}
+
+/* Print Styles for Clinical Reports */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

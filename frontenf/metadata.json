@@ -1,0 +1,6 @@
+{
+  "name": "KNEE-AI | Clinical MRI Abnormality Detection",
+  "description": "Production-grade dark clinical radiology PACS Web UI with synchronized 3D volume viewer, attention heatmaps, and evidence range localization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

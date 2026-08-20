@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KNEE-AI | 3D MRI Screening & PACS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface-hover: #21262d;
+            --border: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            
+            --accent-high: #7c3aed;   /* ≥ 70% */
+            --accent-mid: #c084fc;    /* 40-69% */
+            --accent-low: rgba(167, 139, 250, 0.2);  /* 20-39% */
+            --accent-neg: #21262d;    /* < 20% */
+            
+            --warning: #f59e0b;       /* Amber Disclaimer */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 340px;
+            flex: 1;
+            overflow: hidden;
+            padding-bottom: 40px; /* Space for disclaimer */
+        }
+
+        /* Sidebar Controls */
+        .sidebar {
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        select, input[type="file"], input[type="range"] {
+            width: 100%;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent-high);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-high);
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: #6d28d9;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main PACS Viewer */
+        .main-viewer {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 16px;
+            background-color: var(--bg);
+            overflow-y: auto;
+        }
+
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .canvases-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            flex: 1;
+            min-height: 380px;
+        }
+
+        .viewport-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .viewport-title {
+            background-color: rgba(0,0,0,0.3);
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .viewport-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: #000;
+        }
+
+        .viewport-body img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .no-attention-overlay {
+            position: absolute;
+            bottom: 12px;
+            background: rgba(0,0,0,0.7);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* Scrub Slider Controls */
+        .scrub-container {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scrub-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .slider-track-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-high);
+            cursor: pointer;
+        }
+
+        /* Findings Side Panel */
+        .findings-panel {
+            background-color: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .chips-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.1s ease;
+        }
+
+        .chip:hover {
+            transform: translateX(3px);
+        }
+
+        .chip-high { background-color: var(--accent-high); color: #fff; }
+        .chip-mid { background-color: var(--accent-mid); color: #000; }
+        .chip-low { background-color: var(--accent-low); color: #c084fc; border-color: var(--accent-mid); }
+        .chip-neg { background-color: var(--accent-neg); color: var(--text-secondary); }
+
+        .summary-box {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+        }
+
+        /* Persistent Amber Disclaimer */
+        .disclaimer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1c1917;
+            border-top: 1px solid var(--warning);
+            color: var(--warning);
+            text-align: center;
+            padding: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🦴 KNEE-AI <span>| 3D MRI Screening & Explainable PACS</span></h1>
+        <div class="subtitle">AI Clinical Decision Support Suite</div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar Controls -->
+        <div class="sidebar">
+            <div class="panel-title">📁 Data Input</div>
+            
+            <div class="form-group">
+                <label>Select Sample Study:</label>
+                <select id="sampleSelect">
+                    <option value="">Loading studies...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Or Upload DICOM ZIP:</label>
+                <input type="file" id="fileUpload" accept=".zip">
+            </div>
+
+            <div class="form-group">
+                <label>Attention Threshold: <span id="threshVal">0.50</span></label>
+                <input type="range" id="threshSlider" min="0.1" max="0.9" step="0.05" value="0.5">
+            </div>
+
+            <button class="btn-primary" id="runBtn">⚡ Run Inference</button>
+        </div>
+
+        <!-- Main PACS 3D Viewer -->
+        <div class="main-viewer">
+            <div class="viewer-header">
+                <div class="panel-title">🔍 Synchronized 3D Volume Viewer</div>
+                <div id="activeFindingLabel" style="font-size: 0.85rem; color: var(--accent-mid); font-weight: 600;">Active Channel: None</div>
+            </div>
+
+            <div class="canvases-container">
+                <div class="viewport-card">
+                    <div class="viewport-title">RAW MRI SLICE <span id="sliceNumLabel">Slice 0/0</span></div>
+                    <div class="viewport-body">
+                        <img id="rawSliceImg" src="" alt="Raw Slice Viewer">
+                    </div>
+                </div>
+
+                <div class="viewport-card">
+                    <div class="viewport-title">GRAD-CAM MODEL ATTENTION <span id="heatmapLabel">Select Finding</span></div>
+                    <div class="viewport-body">
+                        <img id="heatmapImg" src="" alt="Heatmap Viewer">
+                        <div class="no-attention-overlay" id="noAttentionTag" style="display:none;">No significant attention on slice</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zero-Lag Scrub Slider -->
+            <div class="scrub-container">
+                <div class="scrub-header">
+                    <span>Scrub MRI Volume</span>
+                    <span id="sliderIdxText">Slice 0 / 0</span>
+                </div>
+                <div class="slider-track-wrapper">
+                    <input type="range" id="sliceSlider" min="0" max="0" value="0" disabled>
+                </div>
+            </div>
+        </div>
+
+        <!-- Findings Side Panel -->
+        <div class="findings-panel">
+            <div class="panel-title">📊 Probabilities (12 Targets)</div>
+            <div class="chips-grid" id="chipsGrid">
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">Run inference to view predictions.</div>
+            </div>
+
+            <div class="panel-title" style="margin-top: 10px;">📋 Radiology Impression</div>
+            <div class="summary-box" id="summaryBox">Inference summary will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Non-Negotiable Persistent Disclaimer -->
+    <div class="disclaimer-bar">
+        ⚠️ AI-assisted output for research/prototype purposes. Not a medical diagnosis.
+    </div>
+
+    <script>
+        // State variables
+        let appData = null;
+        let activeFinding = null;
+
+        // Elements
+        const sampleSelect = document.getElementById('sampleSelect');
+        const fileUpload = document.getElementById('fileUpload');
+        const threshSlider = document.getElementById('threshSlider');
+        const threshVal = document.getElementById('threshVal');
+        const runBtn = document.getElementById('runBtn');
+        
+        const rawSliceImg = document.getElementById('rawSliceImg');
+        const heatmapImg = document.getElementById('heatmapImg');
+        const noAttentionTag = document.getElementById('noAttentionTag');
+        const sliceSlider = document.getElementById('sliceSlider');
+        const sliceNumLabel = document.getElementById('sliceNumLabel');
+        const sliderIdxText = document.getElementById('sliderIdxText');
+        const activeFindingLabel = document.getElementById('activeFindingLabel');
+        const heatmapLabel = document.getElementById('heatmapLabel');
+        
+        const chipsGrid = document.getElementById('chipsGrid');
+        const summaryBox = document.getElementById('summaryBox');
+
+        // Update threshold display
+        threshSlider.addEventListener('input', (e) => threshVal.textContent = parseFloat(e.target.value).toFixed(2));
+
+        // Load available sample studies
+        async function loadSamples() {
+            try {
+                const res = await fetch('/api/samples');
+                const samples = await res.json();
+                sampleSelect.innerHTML = samples.map(s => `<option value="${s.id}">${s.id}</option>`).join('');
+            } catch (e) {
+                sampleSelect.innerHTML = `<option value="">Failed to load samples</option>`;
+            }
+        }
+        loadSamples();
+
+        // Run Inference
+        runBtn.addEventListener('click', async () => {
+            runBtn.disabled = true;
+            runBtn.textContent = '⏳ Processing...';
+            
+            const formData = new FormData();
+            formData.append('confidence_threshold', threshSlider.value);
+            
+            if (fileUpload.files[0]) {
+                formData.append('file', fileUpload.files[0]);
+            } else if (sampleSelect.value) {
+                formData.append('sample_id', sampleSelect.value);
+            }
+
+            try {
+                const res = await fetch('/api/predict', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error(await res.text());
+                appData = await res.json();
+                
+                initViewer();
+                renderFindings();
+                renderSummary();
+            } catch (err) {
+                alert('Inference Failed: ' + err.message);
+            } finally {
+                runBtn.disabled = false;
+                runBtn.textContent = '⚡ Run Inference';
+            }
+        });
+
+        // Initialize Viewer & Preload Slices
+        function initViewer() {
+            if (!appData || appData.num_slices === 0) return;
+
+            sliceSlider.disabled = false;
+            sliceSlider.min = 0;
+            sliceSlider.max = appData.num_slices - 1;
+            sliceSlider.value = Math.floor(appData.num_slices / 2);
+
+            // Default to first high confidence finding if available
+            const highConfKey = Object.keys(appData.heatmaps)[0];
+            if (highConfKey) {
+                setActiveFinding(highConfKey);
+            } else {
+                activeFinding = null;
+                activeFindingLabel.textContent = 'Active Channel: Raw Only';
+            }
+
+            updateSliceView();
+        }
+
+        // Synchronized Zero-Lag Slice Rendering
+        sliceSlider.addEventListener('input', updateSliceView);
+
+        function updateSliceView() {
+            if (!appData) return;
+            const idx = parseInt(sliceSlider.value);
+            const total = appData.num_slices;
+
+            sliceNumLabel.textContent = `Slice ${idx + 1}/${total}`;
+            sliderIdxText.textContent = `Slice ${idx + 1} / ${total}`;
+
+            // Set raw slice
+            rawSliceImg.src = appData.slices[idx] || '';
+
+            // Set heatmap slice
+            if (activeFinding && appData.heatmaps[activeFinding]) {
+                const heatSrc = appData.heatmaps[activeFinding][idx];
+                if (heatSrc) {
+                    heatmapImg.src = heatSrc;
+                    heatmapImg.style.display = 'block';
+                    noAttentionTag.style.display = 'none';
+                } else {
+                    heatmapImg.src = appData.slices[idx]; // Fallback to raw
+                    noAttentionTag.style.display = 'block';
+                }
+            } else {
+                heatmapImg.src = appData.slices[idx];
+                noAttentionTag.style.display = 'block';
+            }
+        }
+
+        function setActiveFinding(finding) {
+            activeFinding = finding;
+            activeFindingLabel.textContent = `Active Channel: ${finding}`;
+            heatmapLabel.textContent = finding;
+
+            // Auto-jump to evidence range start if exists
+            if (appData.evidence_ranges && appData.evidence_ranges[finding]) {
+                const startIdx = appData.evidence_ranges[finding][0];
+                sliceSlider.value = startIdx;
+            }
+            updateSliceView();
+        }
+
+        // Render Finding Chips
+        function renderFindings() {
+            chipsGrid.innerHTML = '';
+            const sorted = Object.entries(appData.findings).sort((a, b) => b[1] - a[1]);
+
+            sorted.forEach(([lbl, prob]) => {
+                const pct = (prob * 100).toFixed(1);
+                let cls = 'chip-neg';
+                if (prob >= 0.70) cls = 'chip-high';
+                else if (prob >= 0.40) cls = 'chip-mid';
+                else if (prob >= 0.20) cls = 'chip-low';
+
+                const chip = document.createElement('div');
+                chip.className = `chip ${cls}`;
+                chip.innerHTML = `<span>${lbl}</span><span>${pct}%</span>`;
+                chip.addEventListener('click', () => {
+                    if (appData.heatmaps[lbl]) {
+                        setActiveFinding(lbl);
+                    }
+                });
+                chipsGrid.appendChild(chip);
+            });
+        }
+
+        // Render Summary
+        function renderSummary() {
+            summaryBox.textContent = appData.summary.text || 'No impression generated.';
+        }
+    </script>
+</body>
+</html>
