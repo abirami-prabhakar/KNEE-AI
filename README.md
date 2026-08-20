@@ -95,7 +95,7 @@ streamlit run app/app.py
 
 ---
 
-## 🛡️ License
+##  License
 MIT License. See `LICENSE` for details.
 
 *Disclaimer: AI-assisted output for research/prototype purposes. Not a medical diagnosis.*
